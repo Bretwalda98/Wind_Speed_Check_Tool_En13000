@@ -12,9 +12,12 @@
       .no-print { display: none !important; }
       body { color: #000; }
       .card { box-shadow: none !important; border: 1px solid #999; }
+      dialog { display: block !important; position: static !important; transform: none !important; border: 0 !important; box-shadow: none !important; }
+      .backdrop { display: none !important; }
     }
-    /* Small helper for range-tooltips */
     .hint { display:inline-block; border-bottom:1px dotted currentColor; cursor:help; }
+    dialog { width: min(980px, 92vw); border: 0; border-radius: 16px; padding: 0; }
+    .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.35); }
   </style>
 </head>
 <body class="bg-zinc-50 text-zinc-900 selection:bg-yellow-200 selection:text-zinc-900">
@@ -30,6 +33,7 @@
           <p class="text-xs text-zinc-500 -mt-0.5">EN 13000 – Permissible Wind Speed Calculator for Lifts</p>
         </div>
         <div class="ml-auto flex items-center gap-2 no-print">
+          <button id="helpBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100" title="How to use">Help</button>
           <button id="themeBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100">Dark</button>
           <button id="printBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100" title="Print or save as PDF">Print / PDF</button>
           <button id="shareBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100" title="Copy a link with this scenario">Share</button>
@@ -41,7 +45,7 @@
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
       <!-- Notice -->
       <div class="card rounded-2xl border border-zinc-200 bg-white p-4">
-        <p class="text-sm text-zinc-700"><span class="font-semibold">Purpose:</span> Compute the <span class="font-semibold">permissible wind speed V<sub>max</sub></span> for a lift per EN 13000 method using the fixed constant <span class="font-mono">1.2 m²/Te</span>. Compare the result against the crane duty chart value and perform quick <em>what‑if</em> checks.</p>
+        <p class="text-sm text-zinc-700"><span class="font-semibold">Purpose:</span> Compute the <span class="font-semibold">permissible wind speed V<sub>max</sub></span> for a lift per EN 13000 using the fixed constant <span class="font-mono">1.2 m²/Te</span>. Compare the result against the crane duty chart and run quick <em>what-if</em> checks.</p>
       </div>
 
       <div class="grid md:grid-cols-2 gap-6">
@@ -56,7 +60,7 @@
             <label class="block">
               <span class="text-sm font-medium">V<sub>max,TAB</sub> – From duty chart (m/s)</span>
               <input id="vtab" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 11.1" value="11.1"/>
-              <p class="text-xs text-zinc-500 mt-1">Maximum wind speed permitted by the crane duty chart for the configuration.</p>
+              <p class="text-xs text-zinc-500 mt-1">Max wind speed permitted by the crane duty chart for the configuration.</p>
             </label>
             <label class="block">
               <span class="text-sm font-medium">m<sub>hL</sub> – Lifted mass (Te)</span>
@@ -93,7 +97,7 @@
             <label class="block md:col-span-2">
               <span class="text-sm font-medium">Operational/forecast wind (optional, m/s)</span>
               <input id="vop" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 7.5"/>
-              <p class="text-xs text-zinc-500 mt-1">If provided, the tool will show a go/no‑go check against V<sub>perm</sub>.</p>
+              <p class="text-xs text-zinc-500 mt-1">If provided, the tool will show a go/no-go check against V<sub>perm</sub>.</p>
             </label>
           </div>
 
@@ -112,7 +116,7 @@
         <section class="card rounded-2xl border border-zinc-200 bg-white p-5 space-y-5">
           <div class="flex items-center gap-2">
             <h2 class="text-lg font-semibold">Results</h2>
-            <span class="ml-auto text-xs text-zinc-500">Auto‑updates as you type.</span>
+            <span class="ml-auto text-xs text-zinc-500">Auto-updates as you type.</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -138,7 +142,7 @@
             </div>
 
             <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50">
-              <div class="text-xs uppercase tracking-wide text-zinc-500">Go / No‑go check</div>
+              <div class="text-xs uppercase tracking-wide text-zinc-500">Go / No-go check</div>
               <div id="statusPill" class="inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-zinc-200 text-zinc-800">—</div>
               <div class="text-xs text-zinc-500 mt-2">Compares your entered operational wind to V<sub>perm</sub>.</div>
             </div>
@@ -191,20 +195,108 @@
             <li><strong>V<sub>perm</sub></strong> = min(V<sub>calc</sub>, V<sub>max,TAB</sub>).</li>
           </ul>
           <p><strong>Typical c<sub>w</sub> values.</strong> Plate/cube 1.1–2.0, cylinder 0.6–1.0, ball 0.3–0.4, hemisphere (front) 0.2–0.3, hemisphere (rear) 0.8–1.2, wind rotor ≈1.6. Use manufacturer data when available.</p>
-          <p class="text-sm text-zinc-600">This tool is a simplification specific to lifting per EN 13000. It is <em>not</em> a substitute for full wind‑action assessment per EN 1991‑1‑4 (Eurocode) for permanent structures.</p>
+          <p class="text-sm text-zinc-600">This tool is a simplification specific to lifting per EN 13000. It is <em>not</em> a substitute for full wind-action assessment per EN 1991-1-4 (Eurocode) for permanent structures.</p>
         </div>
       </section>
 
       <!-- Footer note -->
       <footer class="text-xs text-zinc-500 py-4">
         <div class="flex flex-wrap items-center gap-2">
-          <span>© Ingeniarch Labs — WindCheck v0.1</span>
+          <span>© Ingeniarch Labs — WindCheck v0.2</span>
           <span class="hidden md:inline">•</span>
           <span>Always follow company procedures and manufacturer instructions and check with a qualified engineer.</span>
         </div>
       </footer>
     </main>
   </div>
+
+  <!-- HELP MODAL -->
+  <div id="helpBackdrop" class="backdrop hidden"></div>
+  <dialog id="helpDialog" class="shadow-2xl">
+    <div class="rounded-2xl overflow-hidden">
+      <div class="bg-zinc-900 text-white px-5 py-3 flex items-center">
+        <h3 class="text-lg font-semibold">WindCheck – Help & How-to</h3>
+        <button id="helpCloseTop" class="ml-auto text-sm px-2 py-1 rounded border border-white/30 hover:bg-white/10">Close</button>
+      </div>
+      <div class="bg-white p-5 max-h-[78vh] overflow-auto">
+        <div class="prose prose-zinc max-w-none">
+          <h4>What this tool does</h4>
+          <p>Calculates the <strong>permissible wind speed</strong> for a lifting operation per <strong>EN 13000</strong>, considering the lifted mass, the effective wind area of the load, and the crane’s duty-chart limit.</p>
+
+          <h4>When to use it</h4>
+          <ul>
+            <li>During lift planning and pre-lift checks.</li>
+            <li>To assess changes in load shape/area, rigging, or mass.</li>
+            <li>To compare forecast/site wind to the governing permissible wind.</li>
+          </ul>
+
+          <h4>Inputs required</h4>
+          <ul>
+            <li><strong>V<sub>max,TAB</sub></strong> (m/s): From the crane manufacturer’s duty chart for the current configuration.</li>
+            <li><strong>m<sub>hL</sub></strong> (Te): Total lifted mass (hook + rigging + load).</li>
+            <li><strong>A<sub>p</sub></strong> (m²): Projected area of the lifted body normal to the wind.</li>
+            <li><strong>c<sub>w</sub></strong> (–): Resistance coefficient for the shape (manufacturer value preferred).</li>
+            <li><strong>Operational wind</strong> (optional, m/s): Measured or forecast site wind for a Go/No-go indication.</li>
+          </ul>
+
+          <h4>Choosing <em>c<sub>w</sub></em> (quick guide)</h4>
+          <table>
+            <thead><tr><th>Body</th><th>Typical c<sub>w</sub></th></tr></thead>
+            <tbody>
+              <tr><td>Plate / cube</td><td>1.1 – 2.0 (≈1.4 default)</td></tr>
+              <tr><td>Cylinder</td><td>0.6 – 1.0 (≈0.8)</td></tr>
+              <tr><td>Ball</td><td>0.3 – 0.4 (≈0.35)</td></tr>
+              <tr><td>Hemisphere (front)</td><td>0.2 – 0.3 (≈0.25)</td></tr>
+              <tr><td>Hemisphere (rear)</td><td>0.8 – 1.2 (≈1.0)</td></tr>
+              <tr><td>Wind turbine rotor</td><td>≈ 1.6</td></tr>
+            </tbody>
+          </table>
+          <p class="text-sm">If a manufacturer provides a specific value, use that instead of the presets.</p>
+
+          <h4>Step-by-step</h4>
+          <ol>
+            <li>Enter <strong>V<sub>max,TAB</sub></strong> from the duty chart.</li>
+            <li>Enter <strong>m<sub>hL</sub></strong>, <strong>A<sub>p</sub></strong>, and choose or type <strong>c<sub>w</sub></strong>.<br>Effective area is computed as <strong>A<sub>w</sub> = A<sub>p</sub> × c<sub>w</sub></strong>.</li>
+            <li>The app calculates <strong>V<sub>calc</sub></strong> = V<sub>max,TAB</sub> × √((1.2 × m<sub>hL</sub>) / A<sub>w</sub>).</li>
+            <li>The governing permissible wind is <strong>V<sub>perm</sub> = min(V<sub>calc</sub>, V<sub>max,TAB</sub>)</strong>.</li>
+            <li>(Optional) Enter site wind to see the <strong>Go/No-go</strong> pill.</li>
+          </ol>
+
+          <h4>Worked examples</h4>
+          <p><strong>Example 1</strong> — m<sub>hL</sub>=65 Te, A<sub>p</sub>=200 m², c<sub>w</sub>=1.4 → A<sub>w</sub>=280 m², V<sub>max,TAB</sub>=11.1 m/s.<br>
+          Result: V<sub>calc</sub>=5.86 m/s → V<sub>perm</sub>=5.86 m/s (limited by load/area).</p>
+          <p><strong>Example 2</strong> — m<sub>hL</sub>=85 Te, A<sub>p</sub>=50 m², c<sub>w</sub>=1.2 → A<sub>w</sub>=60 m², V<sub>max,TAB</sub>=9.0 m/s.<br>
+          Result: V<sub>calc</sub>=11.73 m/s → V<sub>perm</sub>=9.0 m/s (limited by duty chart).</p>
+
+          <h4>Interpreting results</h4>
+          <ul>
+            <li><strong>A<sub>w</sub></strong>: Effective area exposed to wind.</li>
+            <li><strong>V<sub>calc</sub></strong>: Permissible wind from EN 13000 formula for your load.</li>
+            <li><strong>V<sub>perm</sub></strong>: The number that governs (never exceed this). Shown also in mph & knots.</li>
+            <li><strong>Go/No-go</strong>: Quick check comparing your input wind to V<sub>perm</sub>.</li>
+          </ul>
+
+          <h4>Save & share</h4>
+          <ul>
+            <li><strong>Export JSON</strong> to save a scenario file; <strong>Import JSON</strong> to restore it.</li>
+            <li><strong>Share</strong> copies a link with the scenario in the URL hash.</li>
+            <li><strong>Print/PDF</strong> produces a tidy record for attachments.</li>
+          </ul>
+
+          <h4>Standards & limitations</h4>
+          <ul>
+            <li>Method follows <strong>EN 13000</strong> using the constant <strong>1.2 m²/Te</strong> (do not change).</li>
+            <li>Not a replacement for <strong>EN 1991-1-4</strong> (Eurocode) wind actions on permanent structures.</li>
+            <li>Always consult the crane manual, RAMS, site procedures, and a competent person.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="bg-zinc-50 px-5 py-3 flex justify-end gap-2">
+        <button id="helpClose" class="px-3 py-1.5 rounded-lg border border-zinc-300 hover:bg-zinc-200">Close</button>
+        <button id="helpPrint" class="px-3 py-1.5 rounded-lg border border-zinc-300 hover:bg-zinc-200">Print Help</button>
+      </div>
+    </div>
+  </dialog>
 
   <script>
     // --- Constants & helpers ---
@@ -253,17 +345,16 @@
           pill.textContent = 'GO: wind ≤ Vperm';
           pill.className = 'inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-600 text-white';
         } else {
-          pill.textContent = 'NO‑GO: wind > Vperm';
+          pill.textContent = 'NO-GO: wind > Vperm';
           pill.className = 'inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-rose-600 text-white';
         }
       }
 
-      // Inverse calculators (target wind → max mass/area/required cw)
+      // Inverse calculators
       const invWind = parseFloat($("invWind").value);
       const invWind2 = parseFloat($("invWind2").value);
       const invWind3 = parseFloat($("invWind3").value);
 
-      // Vtarget must not exceed Vtab; else governed by Vtab
       function effectiveV(vtarget){
         if (!isFinite(vtarget) || vtarget <= 0 || !isFinite(vtab) || vtab <= 0) return NaN;
         return Math.min(vtarget, vtab);
@@ -273,14 +364,10 @@
       const V2 = effectiveV(invWind2);
       const V3 = effectiveV(invWind3);
 
-      // From V = Vtab * sqrt((1.2 m)/Aw)  →  m = (Aw/1.2) * (V/Vtab)^2
       $("invMass").textContent = fmt((ap * cw / EN13000_A0) * (V1*V1) / (vtab*vtab));
-      // From V = Vtab * sqrt((1.2 m)/Aw)  →  Aw = (1.2 m) * (Vtab/V)^2  →  Ap = Aw/cw
       $("invArea").textContent = fmt(((EN13000_A0 * massTe) * (vtab*vtab) / (V2*V2)) / cw);
-      // From V = Vtab * sqrt((1.2 m)/Aw) with Aw=Ap*cw → cw = (1.2 m / Ap) * (Vtab/V)^2
       $("invCw").textContent = fmt(((EN13000_A0 * massTe) / ap) * (vtab*vtab) / (V3*V3));
 
-      // Return object for saving/sharing
       return { vtab, massTe, ap, cw, vop };
     }
 
@@ -296,7 +383,7 @@
     }
 
     // --- Events ---
-    const inputs = ["vtab","massTe","ap","cw","vop","invWind","invWind2","invWind3"]; 
+    const inputs = ["vtab","massTe","ap","cw","vop","invWind","invWind2","invWind3"];
     inputs.forEach(id => $(id).addEventListener('input', compute));
 
     $("cwPreset").addEventListener('change', (e)=>{
@@ -311,12 +398,8 @@
       compute();
     });
 
-    $("ex1").addEventListener('click', ()=>{
-      loadScenario({ vtab: 11.1, massTe: 65, ap: 200, cw: 1.4, vop: 6 });
-    });
-    $("ex2").addEventListener('click', ()=>{
-      loadScenario({ vtab: 9.0, massTe: 85, ap: 50, cw: 1.2, vop: 8 });
-    });
+    $("ex1").addEventListener('click', ()=>{ loadScenario({ vtab: 11.1, massTe: 65, ap: 200, cw: 1.4, vop: 6 }); });
+    $("ex2").addEventListener('click', ()=>{ loadScenario({ vtab: 9.0, massTe: 85, ap: 50, cw: 1.2, vop: 8 }); });
     $("resetBtn").addEventListener('click', ()=>{
       loadScenario({ vtab: 11.1, massTe: 65, ap: 200, cw: 1.4, vop: '' });
       $("invWind").value = '';
@@ -328,7 +411,7 @@
 
     $("saveBtn").addEventListener('click', ()=>{
       const scn = compute();
-      const blob = new Blob([JSON.stringify({version:"WindCheck v0.1", scenario: scn}, null, 2)], {type:'application/json'});
+      const blob = new Blob([JSON.stringify({version:"WindCheck v0.2", scenario: scn}, null, 2)], {type:'application/json'});
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = 'windcheck_scenario.json';
@@ -391,6 +474,30 @@
       setTheme(dark ? 'light' : 'dark');
     });
 
+    // Help modal
+    const helpBtn = $("helpBtn");
+    const helpDialog = $("helpDialog");
+    const helpBackdrop = $("helpBackdrop");
+    const helpClose = $("helpClose");
+    const helpCloseTop = $("helpCloseTop");
+    const helpPrint = $("helpPrint");
+
+    function openHelp(){
+      helpBackdrop.classList.remove('hidden');
+      helpDialog.showModal();
+    }
+    function closeHelp(){
+      helpBackdrop.classList.add('hidden');
+      helpDialog.close();
+    }
+
+    helpBtn.addEventListener('click', openHelp);
+    helpClose.addEventListener('click', closeHelp);
+    helpCloseTop.addEventListener('click', closeHelp);
+    helpBackdrop.addEventListener('click', closeHelp);
+    helpPrint.addEventListener('click', ()=> window.print());
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeHelp(); });
+
     // On load: hydrate from hash if present
     const scn = unpackFromHash();
     if (scn) loadScenario(scn);
@@ -398,3 +505,4 @@
   </script>
 </body>
 </html>
+
