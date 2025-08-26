@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Phoenix WindCheck – EN13000 Permissible Wind Speed Tool</title>
+  <!-- Tailwind (CDN build) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Print/export-friendly */
+    @media print {
+      .no-print { display: none !important; }
+      body { color: #000; }
+      .card { box-shadow: none !important; border: 1px solid #999; }
+    }
+    /* Small helper for range-tooltips */
+    .hint { display:inline-block; border-bottom:1px dotted currentColor; cursor:help; }
+  </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900 selection:bg-yellow-200 selection:text-zinc-900">
+  <div class="min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-zinc-200">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-amber-600">
+          <path d="M12 2l2.39 4.84L20 8l-4 3.9L17 18l-5-2.6L7 18l1-6.1L4 8l5.61-1.16L12 2z" stroke="currentColor" stroke-width="1.5" fill="currentColor"/>
+        </svg>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">Phoenix WindCheck</h1>
+          <p class="text-xs text-zinc-500 -mt-0.5">EN 13000 – Permissible Wind Speed Calculator for Lifts</p>
+        </div>
+        <div class="ml-auto flex items-center gap-2 no-print">
+          <button id="themeBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100">Dark</button>
+          <button id="printBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100" title="Print or save as PDF">Print / PDF</button>
+          <button id="shareBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100" title="Copy a link with this scenario">Share</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+      <!-- Notice -->
+      <div class="card rounded-2xl border border-zinc-200 bg-white p-4">
+        <p class="text-sm text-zinc-700"><span class="font-semibold">Purpose:</span> Compute the <span class="font-semibold">permissible wind speed V<sub>max</sub></span> for a lift per EN 13000 method using the fixed constant <span class="font-mono">1.2 m²/Te</span>. Compare the result against the crane duty chart value and perform quick <em>what‑if</em> checks.</p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <!-- Inputs -->
+        <section class="card rounded-2xl border border-zinc-200 bg-white p-5 space-y-5">
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-semibold">Inputs</h2>
+            <span class="ml-auto text-xs text-zinc-500">All units SI unless noted.</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <label class="block">
+              <span class="text-sm font-medium">V<sub>max,TAB</sub> – From duty chart (m/s)</span>
+              <input id="vtab" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 11.1" value="11.1"/>
+              <p class="text-xs text-zinc-500 mt-1">Maximum wind speed permitted by the crane duty chart for the configuration.</p>
+            </label>
+            <label class="block">
+              <span class="text-sm font-medium">m<sub>hL</sub> – Lifted mass (Te)</span>
+              <input id="massTe" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="Include hook+rigging+load" value="65" />
+              <p class="text-xs text-zinc-500 mt-1">Total lifted mass: hook, rigging and load (metric tonnes).</p>
+            </label>
+
+            <label class="block md:col-span-2">
+              <span class="text-sm font-medium">A<sub>p</sub> – Projected area (m²)</span>
+              <input id="ap" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 200" value="200" />
+              <p class="text-xs text-zinc-500 mt-1">Projected area normal to wind direction for the lifted body/assembly.</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium">Preset shape (c<sub>w</sub>)</span>
+              <select id="cwPreset" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 bg-white">
+                <option value="custom">— Set manually —</option>
+                <option value="1.4" data-note="Plate / cube 1.1–2.0">Plate / cube (≈1.4)</option>
+                <option value="0.8" data-note="Cylinder 0.6–1.0">Cylinder (≈0.8)</option>
+                <option value="0.35" data-note="Ball 0.3–0.4">Ball (≈0.35)</option>
+                <option value="0.25" data-note="Hemisphere (front) 0.2–0.3">Hemisphere front (≈0.25)</option>
+                <option value="1.0" data-note="Hemisphere (rear) 0.8–1.2">Hemisphere rear (≈1.0)</option>
+                <option value="1.6" data-note="Wind rotor ≈1.6">Wind turbine rotor (≈1.6)</option>
+              </select>
+              <p id="cwNote" class="text-xs text-zinc-500 mt-1">Choose a shape or set c<sub>w</sub> manually.</p>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium">c<sub>w</sub> – Resistance coefficient</span>
+              <input id="cw" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 1.4" value="1.4" />
+              <p class="text-xs text-zinc-500 mt-1">Use manufacturer value where available. Otherwise choose a conservative preset.</p>
+            </label>
+
+            <label class="block md:col-span-2">
+              <span class="text-sm font-medium">Operational/forecast wind (optional, m/s)</span>
+              <input id="vop" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 7.5"/>
+              <p class="text-xs text-zinc-500 mt-1">If provided, the tool will show a go/no‑go check against V<sub>perm</sub>.</p>
+            </label>
+          </div>
+
+          <div class="flex flex-wrap gap-2 pt-1 no-print">
+            <button id="ex1" class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm">Load Example 1</button>
+            <button id="ex2" class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm">Load Example 2</button>
+            <button id="resetBtn" class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm">Reset</button>
+            <button id="saveBtn" class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm">Export JSON</button>
+            <label class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm cursor-pointer">Import JSON
+              <input id="loadFile" type="file" accept="application/json" class="hidden" />
+            </label>
+          </div>
+        </section>
+
+        <!-- Results -->
+        <section class="card rounded-2xl border border-zinc-200 bg-white p-5 space-y-5">
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-semibold">Results</h2>
+            <span class="ml-auto text-xs text-zinc-500">Auto‑updates as you type.</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50">
+              <div class="text-xs uppercase tracking-wide text-zinc-500">Effective area</div>
+              <div class="text-2xl font-bold"><span id="awOut">—</span> <span class="text-base font-semibold text-zinc-500">m²</span></div>
+              <div class="text-xs text-zinc-500 mt-1">A<sub>w</sub> = A<sub>p</sub> × c<sub>w</sub></div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50">
+              <div class="text-xs uppercase tracking-wide text-zinc-500">Permissible wind (calc)</div>
+              <div class="text-2xl font-bold"><span id="vcalcOut">—</span> <span class="text-base font-semibold text-zinc-500">m/s</span></div>
+              <div class="text-xs text-zinc-500 mt-1">V<sub>calc</sub> = V<sub>max,TAB</sub> · √((1.2 · m<sub>hL</sub>) / A<sub>w</sub>)</div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50">
+              <div class="text-xs uppercase tracking-wide text-zinc-500">Governing permissible wind</div>
+              <div class="text-2xl font-bold flex items-baseline gap-2"><span id="vpermOut">—</span> <span class="text-base font-semibold text-zinc-500">m/s</span>
+                <span id="vpermNote" class="text-xs text-zinc-500"></span>
+              </div>
+              <div class="text-xs text-zinc-500 mt-1">V<sub>perm</sub> = min(V<sub>calc</sub>, V<sub>max,TAB</sub>)</div>
+              <div class="text-xs text-zinc-500 mt-2">= <span id="vpermMph">—</span> mph · <span id="vpermKts">—</span> kn</div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50">
+              <div class="text-xs uppercase tracking-wide text-zinc-500">Go / No‑go check</div>
+              <div id="statusPill" class="inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-zinc-200 text-zinc-800">—</div>
+              <div class="text-xs text-zinc-500 mt-2">Compares your entered operational wind to V<sub>perm</sub>.</div>
+            </div>
+          </div>
+
+          <!-- Quick inverses -->
+          <div class="mt-2 p-4 rounded-xl border border-amber-200 bg-amber-50">
+            <div class="text-sm font-semibold mb-2">Quick inverse checks</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <label class="block">
+                <span class="font-medium">Max mass for target wind</span>
+                <div class="flex items-center gap-2 mt-1">
+                  <input id="invWind" type="number" step="0.01" class="w-32 rounded-lg border border-zinc-300 px-3 py-2" placeholder="m/s"/>
+                  <span class="text-zinc-500">→</span>
+                  <span id="invMass" class="font-semibold">—</span><span class="text-zinc-500"> Te</span>
+                </div>
+                <p class="text-xs text-zinc-500 mt-1">Given V<sub>target</sub>, A<sub>p</sub>, c<sub>w</sub>, and V<sub>max,TAB</sub>.</p>
+              </label>
+              <label class="block">
+                <span class="font-medium">Max area for target wind</span>
+                <div class="flex items-center gap-2 mt-1">
+                  <input id="invWind2" type="number" step="0.01" class="w-32 rounded-lg border border-zinc-300 px-3 py-2" placeholder="m/s"/>
+                  <span class="text-zinc-500">→</span>
+                  <span id="invArea" class="font-semibold">—</span><span class="text-zinc-500"> m²</span>
+                </div>
+                <p class="text-xs text-zinc-500 mt-1">Given V<sub>target</sub>, m<sub>hL</sub>, c<sub>w</sub>, and V<sub>max,TAB</sub>.</p>
+              </label>
+              <label class="block">
+                <span class="font-medium">Required c<sub>w</sub> for target wind</span>
+                <div class="flex items-center gap-2 mt-1">
+                  <input id="invWind3" type="number" step="0.01" class="w-32 rounded-lg border border-zinc-300 px-3 py-2" placeholder="m/s"/>
+                  <span class="text-zinc-500">→</span>
+                  <span id="invCw" class="font-semibold">—</span>
+                </div>
+                <p class="text-xs text-zinc-500 mt-1">Given V<sub>target</sub>, m<sub>hL</sub>, A<sub>p</sub>, and V<sub>max,TAB</sub>.</p>
+              </label>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Theory & Guidance -->
+      <section class="card rounded-2xl border border-zinc-200 bg-white p-5 space-y-4">
+        <h2 class="text-lg font-semibold">Method (EN 13000) — concise</h2>
+        <div class="prose prose-zinc max-w-none">
+          <p><strong>Formula.</strong> \( V_{calc} = V_{max,TAB} \cdot \sqrt{\dfrac{1.2\; m_{hL}}{A_w}} \), with \( A_w = A_p\, c_w \).</p>
+          <ul>
+            <li><strong>1.2 m²/Te</strong> is the EN 13000 constant; do not alter.</li>
+            <li><strong>A<sub>w</sub></strong> includes shape effects via <em>c<sub>w</sub></em>.</li>
+            <li><strong>V<sub>perm</sub></strong> = min(V<sub>calc</sub>, V<sub>max,TAB</sub>).</li>
+          </ul>
+          <p><strong>Typical c<sub>w</sub> values.</strong> Plate/cube 1.1–2.0, cylinder 0.6–1.0, ball 0.3–0.4, hemisphere (front) 0.2–0.3, hemisphere (rear) 0.8–1.2, wind rotor ≈1.6. Use manufacturer data when available.</p>
+          <p class="text-sm text-zinc-600">This tool is a simplification specific to lifting per EN 13000. It is <em>not</em> a substitute for full wind‑action assessment per EN 1991‑1‑4 (Eurocode) for permanent structures.</p>
+        </div>
+      </section>
+
+      <!-- Footer note -->
+      <footer class="text-xs text-zinc-500 py-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <span>© Phoenix / Ingeniarch Labs — WindCheck v0.1</span>
+          <span class="hidden md:inline">•</span>
+          <span>Author: tool built to mirror the style of Loadspreader app.</span>
+          <span class="hidden md:inline">•</span>
+          <span>Always follow company procedures and manufacturer instructions.</span>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // --- Constants & helpers ---
+    const EN13000_A0 = 1.2; // m^2/Te (do not change)
+    const $ = (id) => document.getElementById(id);
+    const fmt = (v, d=2) => (isFinite(v) ? Number(v).toFixed(d) : '—');
+    const toMph = (ms) => ms * 2.23693629;
+    const toKnots = (ms) => ms * 1.94384449;
+
+    function readInputs() {
+      return {
+        vtab: parseFloat($("vtab").value),
+        massTe: parseFloat($("massTe").value),
+        ap: parseFloat($("ap").value),
+        cw: parseFloat($("cw").value),
+        vop: parseFloat($("vop").value)
+      };
+    }
+
+    function compute() {
+      const { vtab, massTe, ap, cw, vop } = readInputs();
+      const aw = ap * cw; // m^2
+      let vcalc = NaN, vperm = NaN, note = '';
+      if (aw > 0 && vtab > 0 && massTe > 0) {
+        vcalc = vtab * Math.sqrt((EN13000_A0 * massTe) / aw);
+        vperm = Math.min(vcalc, vtab);
+        note = (vcalc > vtab)
+          ? 'Limited by duty chart.'
+          : 'Limited by load/area.';
+      }
+
+      // Outputs
+      $("awOut").textContent = fmt(aw);
+      $("vcalcOut").textContent = fmt(vcalc);
+      $("vpermOut").textContent = fmt(vperm);
+      $("vpermNote").textContent = note ? '(' + note + ')' : '';
+      $("vpermMph").textContent = fmt(toMph(vperm));
+      $("vpermKts").textContent = fmt(toKnots(vperm));
+
+      // Status pill
+      const pill = $("statusPill");
+      pill.textContent = '—';
+      pill.className = 'inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-zinc-200 text-zinc-800';
+      if (!isNaN(vop) && isFinite(vperm)) {
+        if (vop <= vperm) {
+          pill.textContent = 'GO: wind ≤ Vperm';
+          pill.className = 'inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-emerald-600 text-white';
+        } else {
+          pill.textContent = 'NO‑GO: wind > Vperm';
+          pill.className = 'inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-rose-600 text-white';
+        }
+      }
+
+      // Inverse calculators (target wind → max mass/area/required cw)
+      const invWind = parseFloat($("invWind").value);
+      const invWind2 = parseFloat($("invWind2").value);
+      const invWind3 = parseFloat($("invWind3").value);
+
+      // Vtarget must not exceed Vtab; else governed by Vtab
+      function effectiveV(vtarget){
+        if (!isFinite(vtarget) || vtarget <= 0 || !isFinite(vtab) || vtab <= 0) return NaN;
+        return Math.min(vtarget, vtab);
+      }
+
+      const V1 = effectiveV(invWind);
+      const V2 = effectiveV(invWind2);
+      const V3 = effectiveV(invWind3);
+
+      // From V = Vtab * sqrt((1.2 m)/Aw)  →  m = (Aw/1.2) * (V/Vtab)^2
+      $("invMass").textContent = fmt((ap * cw / EN13000_A0) * (V1*V1) / (vtab*vtab));
+      // From V = Vtab * sqrt((1.2 m)/Aw)  →  Aw = (1.2 m) * (Vtab/V)^2  →  Ap = Aw/cw
+      $("invArea").textContent = fmt(((EN13000_A0 * massTe) * (vtab*vtab) / (V2*V2)) / cw);
+      // From V = Vtab * sqrt((1.2 m)/Aw) with Aw=Ap*cw → cw = (1.2 m / Ap) * (Vtab/V)^2
+      $("invCw").textContent = fmt(((EN13000_A0 * massTe) / ap) * (vtab*vtab) / (V3*V3));
+
+      // Return object for saving/sharing
+      return { vtab, massTe, ap, cw, vop };
+    }
+
+    function loadScenario(scn) {
+      if (!scn) return;
+      if (typeof scn.vtab === 'number') $("vtab").value = scn.vtab;
+      if (typeof scn.massTe === 'number') $("massTe").value = scn.massTe;
+      if (typeof scn.ap === 'number') $("ap").value = scn.ap;
+      if (typeof scn.cw === 'number') $("cw").value = scn.cw;
+      if (typeof scn.vop === 'number') $("vop").value = scn.vop;
+      $("cwPreset").value = 'custom';
+      compute();
+    }
+
+    // --- Events ---
+    const inputs = ["vtab","massTe","ap","cw","vop","invWind","invWind2","invWind3"]; 
+    inputs.forEach(id => $(id).addEventListener('input', compute));
+
+    $("cwPreset").addEventListener('change', (e)=>{
+      const val = e.target.value;
+      if (val !== 'custom') {
+        $("cw").value = parseFloat(val);
+        const note = e.target.options[e.target.selectedIndex].dataset.note || '';
+        $("cwNote").textContent = note;
+      } else {
+        $("cwNote").textContent = 'Choose a shape or set c_w manually.';
+      }
+      compute();
+    });
+
+    $("ex1").addEventListener('click', ()=>{
+      loadScenario({ vtab: 11.1, massTe: 65, ap: 200, cw: 1.4, vop: 6 });
+    });
+    $("ex2").addEventListener('click', ()=>{
+      loadScenario({ vtab: 9.0, massTe: 85, ap: 50, cw: 1.2, vop: 8 });
+    });
+    $("resetBtn").addEventListener('click', ()=>{
+      loadScenario({ vtab: 11.1, massTe: 65, ap: 200, cw: 1.4, vop: '' });
+      $("invWind").value = '';
+      $("invWind2").value = '';
+      $("invWind3").value = '';
+    });
+
+    $("printBtn").addEventListener('click', ()=> window.print());
+
+    $("saveBtn").addEventListener('click', ()=>{
+      const scn = compute();
+      const blob = new Blob([JSON.stringify({version:"WindCheck v0.1", scenario: scn}, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'windcheck_scenario.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    $("loadFile").addEventListener('change', (e)=>{
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        try {
+          const data = JSON.parse(reader.result);
+          loadScenario(data.scenario || data);
+        } catch { alert('Invalid JSON file.'); }
+      };
+      reader.readAsText(file);
+    });
+
+    // Share link with URL hash
+    function packToHash() {
+      const scn = compute();
+      const payload = btoa(unescape(encodeURIComponent(JSON.stringify(scn))));
+      return '#scn=' + payload;
+    }
+    function unpackFromHash() {
+      const h = location.hash;
+      const m = h.match(/#scn=([^&]+)/);
+      if (!m) return null;
+      try {
+        return JSON.parse(decodeURIComponent(escape(atob(m[1]))));
+      } catch { return null; }
+    }
+
+    $("shareBtn").addEventListener('click', ()=>{
+      const url = location.origin + location.pathname + packToHash();
+      navigator.clipboard.writeText(url).then(()=>{
+        alert('Shareable link copied to clipboard.');
+      }, ()=>{
+        prompt('Copy this link:', url);
+      });
+    });
+
+    // Theme toggle
+    const themeBtn = $("themeBtn");
+    function setTheme(mode) {
+      if (mode === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.className = 'bg-zinc-900 text-zinc-100';
+        themeBtn.textContent = 'Light';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.className = 'bg-zinc-50 text-zinc-900';
+        themeBtn.textContent = 'Dark';
+      }
+    }
+    themeBtn.addEventListener('click', ()=>{
+      const dark = document.documentElement.classList.contains('dark');
+      setTheme(dark ? 'light' : 'dark');
+    });
+
+    // On load: hydrate from hash if present
+    const scn = unpackFromHash();
+    if (scn) loadScenario(scn);
+    compute();
+  </script>
+</body>
+</html>
