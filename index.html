@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,33 +10,33 @@
     /* Print/export-friendly */
     @media print {
       .no-print { display: none !important; }
-      body { color: #000; }
-      .card { box-shadow: none !important; border: 1px solid #999; }
+      html, body { background: #fff !important; color: #000 !important; }
+      .card { box-shadow: none !important; border: 1px solid #999 !important; }
       dialog { display: block !important; position: static !important; transform: none !important; border: 0 !important; box-shadow: none !important; }
       .backdrop { display: none !important; }
     }
     .hint { display:inline-block; border-bottom:1px dotted currentColor; cursor:help; }
     dialog { width: min(980px, 92vw); border: 0; border-radius: 16px; padding: 0; }
-    .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.35); }
+    .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); }
   </style>
 </head>
-<body class="bg-zinc-50 text-zinc-900 selection:bg-yellow-200 selection:text-zinc-900">
+<body class="bg-[#0b1220] text-slate-100 selection:bg-cyan-300 selection:text-slate-900">
   <div class="min-h-screen">
     <!-- Header -->
-    <header class="sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-zinc-200">
+    <header class="sticky top-0 z-20 bg-slate-900/80 backdrop-blur border-b border-slate-800">
       <div class="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-amber-600">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="text-cyan-400">
           <path d="M12 2l2.39 4.84L20 8l-4 3.9L17 18l-5-2.6L7 18l1-6.1L4 8l5.61-1.16L12 2z" stroke="currentColor" stroke-width="1.5" fill="currentColor"/>
         </svg>
         <div>
           <h1 class="text-xl font-bold tracking-tight">WindCheck</h1>
-          <p class="text-xs text-zinc-500 -mt-0.5">EN 13000 – Permissible Wind Speed Calculator for Lifts</p>
+          <p class="text-xs text-slate-400 -mt-0.5">EN 13000 – Permissible Wind Speed Calculator for Lifts</p>
         </div>
         <div class="ml-auto flex items-center gap-2 no-print">
-          <button id="helpBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100" title="How to use">Help</button>
-          <button id="themeBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100">Dark</button>
-          <button id="printBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100" title="Print or save as PDF">Print / PDF</button>
-          <button id="shareBtn" class="px-3 py-1.5 text-sm rounded-lg border border-zinc-300 hover:bg-zinc-100" title="Copy a link with this scenario">Share</button>
+          <button id="helpBtn" class="px-3 py-1.5 text-sm rounded-lg border border-slate-700 hover:bg-slate-800">Help</button>
+          <button id="themeBtn" class="px-3 py-1.5 text-sm rounded-lg border border-slate-700 hover:bg-slate-800">Light</button>
+          <button id="printBtn" class="px-3 py-1.5 text-sm rounded-lg border border-slate-700 hover:bg-slate-800" title="Print or save as PDF">Print / PDF</button>
+          <button id="shareBtn" class="px-3 py-1.5 text-sm rounded-lg border border-slate-700 hover:bg-slate-800" title="Copy a link with this scenario">Share</button>
         </div>
       </div>
     </header>
@@ -44,39 +44,39 @@
     <!-- Main -->
     <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
       <!-- Notice -->
-      <div class="card rounded-2xl border border-zinc-200 bg-white p-4">
-        <p class="text-sm text-zinc-700"><span class="font-semibold">Purpose:</span> Compute the <span class="font-semibold">permissible wind speed V<sub>max</sub></span> for a lift per EN 13000 using the fixed constant <span class="font-mono">1.2 m²/Te</span>. Compare the result against the crane duty chart and run quick <em>what-if</em> checks.</p>
+      <div class="card rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-lg shadow-black/20">
+        <p class="text-sm text-slate-300"><span class="font-semibold text-slate-100">Purpose:</span> Compute the <span class="font-semibold">permissible wind speed V<sub>max</sub></span> for a lift per EN 13000 using the fixed constant <span class="font-mono">1.2 m²/Te</span>. Compare the result against the crane duty chart and run quick <em>what-if</em> checks.</p>
       </div>
 
       <div class="grid md:grid-cols-2 gap-6">
         <!-- Inputs -->
-        <section class="card rounded-2xl border border-zinc-200 bg-white p-5 space-y-5">
+        <section class="card rounded-2xl border border-slate-800 bg-slate-900 p-5 space-y-5 shadow-lg shadow-black/20">
           <div class="flex items-center gap-2">
             <h2 class="text-lg font-semibold">Inputs</h2>
-            <span class="ml-auto text-xs text-zinc-500">All units SI unless noted.</span>
+            <span class="ml-auto text-xs text-slate-400">All units SI unless noted.</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <label class="block">
               <span class="text-sm font-medium">V<sub>max,TAB</sub> – From duty chart (m/s)</span>
-              <input id="vtab" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 11.1" value="11.1"/>
-              <p class="text-xs text-zinc-500 mt-1">Max wind speed permitted by the crane duty chart for the configuration.</p>
+              <input id="vtab" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 placeholder-slate-400" placeholder="e.g. 11.1" value="11.1"/>
+              <p class="text-xs text-slate-400 mt-1">Max wind speed permitted by the crane duty chart for the configuration.</p>
             </label>
             <label class="block">
               <span class="text-sm font-medium">m<sub>hL</sub> – Lifted mass (Te)</span>
-              <input id="massTe" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="Include hook+rigging+load" value="65" />
-              <p class="text-xs text-zinc-500 mt-1">Total lifted mass: hook, rigging and load (metric tonnes).</p>
+              <input id="massTe" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 placeholder-slate-400" placeholder="Include hook+rigging+load" value="65" />
+              <p class="text-xs text-slate-400 mt-1">Total lifted mass: hook, rigging and load (metric tonnes).</p>
             </label>
 
             <label class="block md:col-span-2">
               <span class="text-sm font-medium">A<sub>p</sub> – Projected area (m²)</span>
-              <input id="ap" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 200" value="200" />
-              <p class="text-xs text-zinc-500 mt-1">Projected area normal to wind direction for the lifted body/assembly.</p>
+              <input id="ap" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 placeholder-slate-400" placeholder="e.g. 200" value="200" />
+              <p class="text-xs text-slate-400 mt-1">Projected area normal to wind direction for the lifted body/assembly.</p>
             </label>
 
             <label class="block">
               <span class="text-sm font-medium">Preset shape (c<sub>w</sub>)</span>
-              <select id="cwPreset" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 bg-white">
+              <select id="cwPreset" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2">
                 <option value="custom">— Set manually —</option>
                 <option value="1.4" data-note="Plate / cube 1.1–2.0">Plate / cube (≈1.4)</option>
                 <option value="0.8" data-note="Cylinder 0.6–1.0">Cylinder (≈0.8)</option>
@@ -85,99 +85,99 @@
                 <option value="1.0" data-note="Hemisphere (rear) 0.8–1.2">Hemisphere rear (≈1.0)</option>
                 <option value="1.6" data-note="Wind rotor ≈1.6">Wind turbine rotor (≈1.6)</option>
               </select>
-              <p id="cwNote" class="text-xs text-zinc-500 mt-1">Choose a shape or set c<sub>w</sub> manually.</p>
+              <p id="cwNote" class="text-xs text-slate-400 mt-1">Choose a shape or set c<sub>w</sub> manually.</p>
             </label>
 
             <label class="block">
               <span class="text-sm font-medium">c<sub>w</sub> – Resistance coefficient</span>
-              <input id="cw" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 1.4" value="1.4" />
-              <p class="text-xs text-zinc-500 mt-1">Use manufacturer value where available. Otherwise choose a conservative preset.</p>
+              <input id="cw" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 placeholder-slate-400" placeholder="e.g. 1.4" value="1.4" />
+              <p class="text-xs text-slate-400 mt-1">Use manufacturer value where available. Otherwise choose a conservative preset.</p>
             </label>
 
             <label class="block md:col-span-2">
               <span class="text-sm font-medium">Operational/forecast wind (optional, m/s)</span>
-              <input id="vop" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2" placeholder="e.g. 7.5"/>
-              <p class="text-xs text-zinc-500 mt-1">If provided, the tool will show a go/no-go check against V<sub>perm</sub>.</p>
+              <input id="vop" type="number" step="0.01" class="mt-1 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 placeholder-slate-400" placeholder="e.g. 7.5"/>
+              <p class="text-xs text-slate-400 mt-1">If provided, the tool will show a go/no-go check against V<sub>perm</sub>.</p>
             </label>
           </div>
 
           <div class="flex flex-wrap gap-2 pt-1 no-print">
-            <button id="ex1" class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm">Load Example 1</button>
-            <button id="ex2" class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm">Load Example 2</button>
-            <button id="resetBtn" class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm">Reset</button>
-            <button id="saveBtn" class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm">Export JSON</button>
-            <label class="px-3 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 text-sm cursor-pointer">Import JSON
+            <button id="ex1" class="px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm">Load Example 1</button>
+            <button id="ex2" class="px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm">Load Example 2</button>
+            <button id="resetBtn" class="px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm">Reset</button>
+            <button id="saveBtn" class="px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm">Export JSON</button>
+            <label class="px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm cursor-pointer">Import JSON
               <input id="loadFile" type="file" accept="application/json" class="hidden" />
             </label>
           </div>
         </section>
 
         <!-- Results -->
-        <section class="card rounded-2xl border border-zinc-200 bg-white p-5 space-y-5">
+        <section class="card rounded-2xl border border-slate-800 bg-slate-900 p-5 space-y-5 shadow-lg shadow-black/20">
           <div class="flex items-center gap-2">
             <h2 class="text-lg font-semibold">Results</h2>
-            <span class="ml-auto text-xs text-zinc-500">Auto-updates as you type.</span>
+            <span class="ml-auto text-xs text-slate-400">Auto-updates as you type.</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50">
-              <div class="text-xs uppercase tracking-wide text-zinc-500">Effective area</div>
-              <div class="text-2xl font-bold"><span id="awOut">—</span> <span class="text-base font-semibold text-zinc-500">m²</span></div>
-              <div class="text-xs text-zinc-500 mt-1">A<sub>w</sub> = A<sub>p</sub> × c<sub>w</sub></div>
+            <div class="p-4 rounded-xl border border-slate-800 bg-slate-800/60">
+              <div class="text-[11px] uppercase tracking-wide text-slate-400">Effective area</div>
+              <div class="text-2xl font-bold"><span id="awOut">—</span> <span class="text-base font-semibold text-slate-400">m²</span></div>
+              <div class="text-xs text-slate-400 mt-1">A<sub>w</sub> = A<sub>p</sub> × c<sub>w</sub></div>
             </div>
 
-            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50">
-              <div class="text-xs uppercase tracking-wide text-zinc-500">Permissible wind (calc)</div>
-              <div class="text-2xl font-bold"><span id="vcalcOut">—</span> <span class="text-base font-semibold text-zinc-500">m/s</span></div>
-              <div class="text-xs text-zinc-500 mt-1">V<sub>calc</sub> = V<sub>max,TAB</sub> · √((1.2 · m<sub>hL</sub>) / A<sub>w</sub>)</div>
+            <div class="p-4 rounded-xl border border-slate-800 bg-slate-800/60">
+              <div class="text-[11px] uppercase tracking-wide text-slate-400">Permissible wind (calc)</div>
+              <div class="text-2xl font-bold"><span id="vcalcOut">—</span> <span class="text-base font-semibold text-slate-400">m/s</span></div>
+              <div class="text-xs text-slate-400 mt-1">V<sub>calc</sub> = V<sub>max,TAB</sub> · √((1.2 · m<sub>hL</sub>) / A<sub>w</sub>)</div>
             </div>
 
-            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50">
-              <div class="text-xs uppercase tracking-wide text-zinc-500">Governing permissible wind</div>
-              <div class="text-2xl font-bold flex items-baseline gap-2"><span id="vpermOut">—</span> <span class="text-base font-semibold text-zinc-500">m/s</span>
-                <span id="vpermNote" class="text-xs text-zinc-500"></span>
+            <div class="p-4 rounded-xl border border-slate-800 bg-slate-800/60">
+              <div class="text-[11px] uppercase tracking-wide text-slate-400">Governing permissible wind</div>
+              <div class="text-2xl font-bold flex items-baseline gap-2"><span id="vpermOut">—</span> <span class="text-base font-semibold text-slate-400">m/s</span>
+                <span id="vpermNote" class="text-xs text-slate-400"></span>
               </div>
-              <div class="text-xs text-zinc-500 mt-1">V<sub>perm</sub> = min(V<sub>calc</sub>, V<sub>max,TAB</sub>)</div>
-              <div class="text-xs text-zinc-500 mt-2">= <span id="vpermMph">—</span> mph · <span id="vpermKts">—</span> kn</div>
+              <div class="text-xs text-slate-400 mt-1">V<sub>perm</sub> = min(V<sub>calc</sub>, V<sub>max,TAB</sub>)</div>
+              <div class="text-xs text-slate-400 mt-2">= <span id="vpermMph">—</span> mph · <span id="vpermKts">—</span> kn</div>
             </div>
 
-            <div class="p-4 rounded-xl border border-zinc-200 bg-zinc-50">
-              <div class="text-xs uppercase tracking-wide text-zinc-500">Go / No-go check</div>
-              <div id="statusPill" class="inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-zinc-200 text-zinc-800">—</div>
-              <div class="text-xs text-zinc-500 mt-2">Compares your entered operational wind to V<sub>perm</sub>.</div>
+            <div class="p-4 rounded-xl border border-slate-800 bg-slate-800/60">
+              <div class="text-[11px] uppercase tracking-wide text-slate-400">Go / No-go check</div>
+              <div id="statusPill" class="inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-slate-700 text-white">—</div>
+              <div class="text-xs text-slate-400 mt-2">Compares your entered operational wind to V<sub>perm</sub>.</div>
             </div>
           </div>
 
           <!-- Quick inverses -->
-          <div class="mt-2 p-4 rounded-xl border border-amber-200 bg-amber-50">
+          <div class="mt-2 p-4 rounded-xl border border-cyan-800 bg-cyan-900/20">
             <div class="text-sm font-semibold mb-2">Quick inverse checks</div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <label class="block">
                 <span class="font-medium">Max mass for target wind</span>
                 <div class="flex items-center gap-2 mt-1">
-                  <input id="invWind" type="number" step="0.01" class="w-32 rounded-lg border border-zinc-300 px-3 py-2" placeholder="m/s"/>
-                  <span class="text-zinc-500">→</span>
-                  <span id="invMass" class="font-semibold">—</span><span class="text-zinc-500"> Te</span>
+                  <input id="invWind" type="number" step="0.01" class="w-32 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 placeholder-slate-400" placeholder="m/s"/>
+                  <span class="text-slate-400">→</span>
+                  <span id="invMass" class="font-semibold">—</span><span class="text-slate-400"> Te</span>
                 </div>
-                <p class="text-xs text-zinc-500 mt-1">Given V<sub>target</sub>, A<sub>p</sub>, c<sub>w</sub>, and V<sub>max,TAB</sub>.</p>
+                <p class="text-xs text-slate-400 mt-1">Given V<sub>target</sub>, A<sub>p</sub>, c<sub>w</sub>, and V<sub>max,TAB</sub>.</p>
               </label>
               <label class="block">
                 <span class="font-medium">Max area for target wind</span>
                 <div class="flex items-center gap-2 mt-1">
-                  <input id="invWind2" type="number" step="0.01" class="w-32 rounded-lg border border-zinc-300 px-3 py-2" placeholder="m/s"/>
-                  <span class="text-zinc-500">→</span>
-                  <span id="invArea" class="font-semibold">—</span><span class="text-zinc-500"> m²</span>
+                  <input id="invWind2" type="number" step="0.01" class="w-32 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 placeholder-slate-400" placeholder="m/s"/>
+                  <span class="text-slate-400">→</span>
+                  <span id="invArea" class="font-semibold">—</span><span class="text-slate-400"> m²</span>
                 </div>
-                <p class="text-xs text-zinc-500 mt-1">Given V<sub>target</sub>, m<sub>hL</sub>, c<sub>w</sub>, and V<sub>max,TAB</sub>.</p>
+                <p class="text-xs text-slate-400 mt-1">Given V<sub>target</sub>, m<sub>hL</sub>, c<sub>w</sub>, and V<sub>max,TAB</sub>.</p>
               </label>
               <label class="block">
                 <span class="font-medium">Required c<sub>w</sub> for target wind</span>
                 <div class="flex items-center gap-2 mt-1">
-                  <input id="invWind3" type="number" step="0.01" class="w-32 rounded-lg border border-zinc-300 px-3 py-2" placeholder="m/s"/>
-                  <span class="text-zinc-500">→</span>
+                  <input id="invWind3" type="number" step="0.01" class="w-32 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 placeholder-slate-400" placeholder="m/s"/>
+                  <span class="text-slate-400">→</span>
                   <span id="invCw" class="font-semibold">—</span>
                 </div>
-                <p class="text-xs text-zinc-500 mt-1">Given V<sub>target</sub>, m<sub>hL</sub>, A<sub>p</sub>, and V<sub>max,TAB</sub>.</p>
+                <p class="text-xs text-slate-400 mt-1">Given V<sub>target</sub>, m<sub>hL</sub>, A<sub>p</sub>, and V<sub>max,TAB</sub>.</p>
               </label>
             </div>
           </div>
@@ -185,9 +185,9 @@
       </div>
 
       <!-- Theory & Guidance -->
-      <section class="card rounded-2xl border border-zinc-200 bg-white p-5 space-y-4">
+      <section class="card rounded-2xl border border-slate-800 bg-slate-900 p-5 space-y-4 shadow-lg shadow-black/20">
         <h2 class="text-lg font-semibold">Method (EN 13000) — concise</h2>
-        <div class="prose prose-zinc max-w-none">
+        <div class="prose prose-invert prose-slate max-w-none">
           <p><strong>Formula.</strong> \( V_{calc} = V_{max,TAB} \cdot \sqrt{\dfrac{1.2\; m_{hL}}{A_w}} \), with \( A_w = A_p\, c_w \).</p>
           <ul>
             <li><strong>1.2 m²/Te</strong> is the EN 13000 constant; do not alter.</li>
@@ -195,14 +195,14 @@
             <li><strong>V<sub>perm</sub></strong> = min(V<sub>calc</sub>, V<sub>max,TAB</sub>).</li>
           </ul>
           <p><strong>Typical c<sub>w</sub> values.</strong> Plate/cube 1.1–2.0, cylinder 0.6–1.0, ball 0.3–0.4, hemisphere (front) 0.2–0.3, hemisphere (rear) 0.8–1.2, wind rotor ≈1.6. Use manufacturer data when available.</p>
-          <p class="text-sm text-zinc-600">This tool is a simplification specific to lifting per EN 13000. It is <em>not</em> a substitute for full wind-action assessment per EN 1991-1-4 (Eurocode) for permanent structures.</p>
+          <p class="text-sm text-slate-400">This tool is a simplification specific to lifting per EN 13000. It is <em>not</em> a substitute for full wind-action assessment per EN 1991-1-4 (Eurocode) for permanent structures.</p>
         </div>
       </section>
 
       <!-- Footer note -->
-      <footer class="text-xs text-zinc-500 py-4">
+      <footer class="text-xs text-slate-400 py-4">
         <div class="flex flex-wrap items-center gap-2">
-          <span>© Ingeniarch Labs — WindCheck v0.2</span>
+          <span>Engineering Tools @ Ingeniarch Labs</span>
           <span class="hidden md:inline">•</span>
           <span>Always follow company procedures and manufacturer instructions and check with a qualified engineer.</span>
         </div>
@@ -214,12 +214,12 @@
   <div id="helpBackdrop" class="backdrop hidden"></div>
   <dialog id="helpDialog" class="shadow-2xl">
     <div class="rounded-2xl overflow-hidden">
-      <div class="bg-zinc-900 text-white px-5 py-3 flex items-center">
+      <div class="bg-slate-900 text-white px-5 py-3 flex items-center">
         <h3 class="text-lg font-semibold">WindCheck – Help & How-to</h3>
         <button id="helpCloseTop" class="ml-auto text-sm px-2 py-1 rounded border border-white/30 hover:bg-white/10">Close</button>
       </div>
-      <div class="bg-white p-5 max-h-[78vh] overflow-auto">
-        <div class="prose prose-zinc max-w-none">
+      <div class="bg-white dark:bg-slate-900 dark:text-slate-100 p-5 max-h-[78vh] overflow-auto">
+        <div class="prose prose-slate dark:prose-invert max-w-none">
           <h4>What this tool does</h4>
           <p>Calculates the <strong>permissible wind speed</strong> for a lifting operation per <strong>EN 13000</strong>, considering the lifted mass, the effective wind area of the load, and the crane’s duty-chart limit.</p>
 
@@ -291,9 +291,9 @@
           </ul>
         </div>
       </div>
-      <div class="bg-zinc-50 px-5 py-3 flex justify-end gap-2">
-        <button id="helpClose" class="px-3 py-1.5 rounded-lg border border-zinc-300 hover:bg-zinc-200">Close</button>
-        <button id="helpPrint" class="px-3 py-1.5 rounded-lg border border-zinc-300 hover:bg-zinc-200">Print Help</button>
+      <div class="bg-white dark:bg-slate-900 px-5 py-3 flex justify-end gap-2">
+        <button id="helpClose" class="px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-800">Close</button>
+        <button id="helpPrint" class="px-3 py-1.5 rounded-lg border border-slate-700 hover:bg-slate-800">Print Help</button>
       </div>
     </div>
   </dialog>
@@ -339,7 +339,7 @@
       // Status pill
       const pill = $("statusPill");
       pill.textContent = '—';
-      pill.className = 'inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-zinc-200 text-zinc-800';
+      pill.className = 'inline-flex items-center gap-2 mt-1 px-3 py-1.5 rounded-full text-sm font-medium bg-slate-700 text-white';
       if (!isNaN(vop) && isFinite(vperm)) {
         if (vop <= vperm) {
           pill.textContent = 'GO: wind ≤ Vperm';
@@ -456,12 +456,12 @@
       });
     });
 
-    // Theme toggle
+    // Theme toggle (default: dark)
     const themeBtn = $("themeBtn");
     function setTheme(mode) {
       if (mode === 'dark') {
         document.documentElement.classList.add('dark');
-        document.body.className = 'bg-zinc-900 text-zinc-100';
+        document.body.className = 'bg-[#0b1220] text-slate-100';
         themeBtn.textContent = 'Light';
       } else {
         document.documentElement.classList.remove('dark');
@@ -498,11 +498,11 @@
     helpPrint.addEventListener('click', ()=> window.print());
     document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeHelp(); });
 
-    // On load: hydrate from hash if present
+    // On load: hydrate from hash if present; ensure dark default
     const scn = unpackFromHash();
     if (scn) loadScenario(scn);
+    setTheme('dark');
     compute();
   </script>
 </body>
 </html>
-
